@@ -128,9 +128,9 @@ class MusicPlayer(QMainWindow):
 
     def browse_songs(self):
         file_dialog = QFileDialog()
-        song_path, _ = file_dialog.getOpenFileName(self)
-        if song_path:
-            self.song_directory = os.path.dirname(song_path)
+        song, _ = file_dialog.getOpenFileName(self)
+        if song:
+            self.song_directory = os.path.dirname(song)
             self.load_songs()
             self.song_index = 0
             self.load_song()
@@ -163,33 +163,28 @@ class MusicPlayer(QMainWindow):
 
     def load_song(self):
             if self.song_index >= 0 and self.song_index < len(self.songs):
-                song_path = self.songs[self.song_index]
-                audio = mutagen.File(song_path)
-                 #print(audio[APIC:kick-mp3-songs-my3songs.jpg])
+                song = self.songs[self.song_index]
+                filedataa = mutagen.File(song)
             try:
-                if audio and 'APIC:' in audio.tags:  # Check if the song has album cover
-                  # Extract the album cover data from the metadata
-                  album_cover_data = audio.tags['APIC:'].data
-                  #print(album_cover_data,"...............................................................")
-                  pixmap = QPixmap()  # Create a QPixmap object to load the image data
-                  pixmap.loadFromData(album_cover_data)  # Load the image data into the QPixmap
-                  self.album_cover_label.setPixmap(pixmap.scaled(150, 150, Qt.KeepAspectRatio))  # Set the album cover pixmap
-                  # Set the default image pixmap
+                if filedataa and 'APIC:' in filedataa.tags:
+                  image = filedataa.tags['APIC:'].data
+                  pixmap = QPixmap()  
+                  pixmap.loadFromData(image) 
+                  self.album_cover_label.setPixmap(pixmap.scaled(150, 150, Qt.KeepAspectRatio))
                 else:
-                    k=dict(audio)
+                    k=dict(filedataa)
                     kk=list(k)
                     kkk=kk[10]
-                    album_cover_data=audio[kkk].data
+                    image=filedataa[kkk].data
                     pixmap=QPixmap()
-                    pixmap.loadFromData(album_cover_data)
-                    self.album_cover_label.setPixmap(pixmap.scaled(150, 150, Qt.KeepAspectRatio))  # Set the album cover pixmap
+                    pixmap.loadFromData(image)
+                    self.album_cover_label.setPixmap(pixmap.scaled(150, 150, Qt.KeepAspectRatio))
             except:
-                 #If no album cover is available, set a default image
-                   default_image_path = r'C:\Users\stanneeru\Desktop\Screenshot.png'  # Provide the path to your default image
+                   default_image_path = r'C:\Users\stanneeru\Desktop\Screenshot.png'
                    pixmap = QPixmap(default_image_path)
                    self.album_cover_label.setPixmap(pixmap.scaled(150, 150, Qt.KeepAspectRatio))
 
-            media_content = QMediaContent(QUrl.fromLocalFile(song_path))
+            media_content = QMediaContent(QUrl.fromLocalFile(song))
             self.media_player.setMedia(media_content)
             self.media_player.play()
             # msg_box = QMessageBox()
